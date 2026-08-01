@@ -1,0 +1,31 @@
+def binary_search(arr, key):
+    low = 0
+    high = len(arr) - 1
+
+    while low <= high:
+        mid = (low + high) // 2
+
+        if arr[mid] == key:
+            return mid
+        elif arr[mid] < key:
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return -1
+
+
+# Sorted bank balances
+balances = [1000, 2500, 4000, 5500, 7000, 8500, 10000]
+
+print("Sorted Bank Balances:")
+print(balances)
+
+key = int(input("Enter balance to search: "))
+
+result = binary_search(balances, key)
+
+if result != -1:
+    print(f"Balance found at index {result}")
+else:
+    print("Balance not found.")
