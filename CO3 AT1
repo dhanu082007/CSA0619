@@ -1,0 +1,149 @@
+#include <stdio.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX 20
+#define SIZE 100
+
+// Structure for compressed words
+typedef struct {
+    int prefixLength;
+    char suffix[SIZE];
+} CompressedWord;
+
+CompressedWord compressed[MAX];
+char original[MAX][SIZE];
+char decoded[MAX][SIZE];
+int n;
+
+// Compress using Front Coding
+void compress()
+{
+    compressed[0].prefixLength = 0;
+    strcpy(compressed[0].suffix, original[0]);
+
+    for(int i=1;i<n;i++)
+    {
+        int j=0;
+
+        while(original[i][j]==original[i-1][j] &&
+              original[i][j]!='\0')
+            j++;
+
+        compressed[i].prefixLength = j;
+
+        strcpy(compressed[i].suffix, original[i]+j);
+    }
+}
+
+// Decode compressed words
+void decode()
+{
+    strcpy(decoded[0], compressed[0].suffix);
+
+    for(int i=1;i<n;i++)
+    {
+        strncpy(decoded[i], decoded[i-1], compressed[i].prefixLength);
+
+        decoded[i][compressed[i].prefixLength]='\0';
+
+        strcat(decoded[i], compressed[i].suffix);
+    }
+}
+
+// Binary Search
+int binarySearch(char arr[][SIZE], int size, char key[])
+{
+    int low=0, high=size-1;
+
+    while(low<=high)
+    {
+        int mid=(low+high)/2;
+
+        int cmp=strcmp(arr[mid],key);
+
+        if(cmp==0)
+            return mid;
+
+        if(cmp<0)
+            low=mid+1;
+        else
+            high=mid-1;
+    }
+
+    return -1;
+}
+
+int main()
+{
+    strcpy(original[0],"apple");
+    strcpy(original[1],"application");
+    strcpy(original[2],"apply");
+    strcpy(original[3],"appoint");
+    strcpy(original[4],"approval");
+    strcpy(original[5],"approve");
+    strcpy(original[6],"apricot");
+    strcpy(original[7],"banana");
+
+    n=8;
+
+    char key[SIZE];
+
+    compress();
+
+    printf("Compressed Data\n");
+    printf("----------------------------\n");
+
+    for(int i=0;i<n;i++)
+    {
+        printf("%d | %s\n",
+               compressed[i].prefixLength,
+               compressed[i].suffix);
+    }
+
+    printf("\nEnter word to search: ");
+    scanf("%s",key);
+
+    clock_t start,end;
+
+    // Normal Binary Search
+    start=clock();
+    int pos1=binarySearch(original,n,key);
+    end=clock();
+
+    double normalTime=((double)(end-start))/CLOCKS_PER_SEC;
+
+    // Decode Time
+    start=clock();
+    decode();
+    end=clock();
+
+    double decodeTime=((double)(end-start))/CLOCKS_PER_SEC;
+
+    // Binary Search after decoding
+    start=clock();
+    int pos2=binarySearch(decoded,n,key);
+    end=clock();
+
+    double compressedTime=((double)(end-start))/CLOCKS_PER_SEC;
+
+    printf("\nDecoded Array\n");
+    printf("----------------------------\n");
+
+    for(int i=0;i<n;i++)
+        printf("%s\n",decoded[i]);
+
+    printf("\nNormal Binary Search Position : %d\n",pos1);
+    printf("Compressed Search Position    : %d\n",pos2);
+
+    printf("\nExecution Time Analysis\n");
+    printf("----------------------------\n");
+
+    printf("Normal Search Time      : %lf sec\n",normalTime);
+    printf("Decoding Overhead       : %lf sec\n",decodeTime);
+    printf("Compressed Search Time  : %lf sec\n",compressedTime);
+    printf("Total Compressed Cost   : %lf sec\n",
+           decodeTime+compressedTime);
+
+    return 0;
+}
