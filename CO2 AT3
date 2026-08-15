@@ -1,0 +1,36 @@
+def min_max(arr):
+    """
+    Find the minimum and maximum values in an array.
+
+    Args:
+        arr: List of numbers.
+
+    Returns:
+        A tuple containing (minimum, maximum).
+
+    Raises:
+        ValueError: If the array is empty.
+    """
+
+    if not arr:
+        raise ValueError("Array cannot be empty")
+
+    # Initialize both values using the first array element
+    mn = arr[0]
+    mx = arr[0]
+
+    # Check every remaining element
+    for x in arr[1:]:
+        if x < mn:
+            mn = x
+
+        if x > mx:
+            mx = x
+
+    return mn, mx
+
+
+# Example tests
+print(min_max([10, 5, 20, 3, 15]))
+print(min_max([-5, -2, -8, -1]))
+print(min_max([-10, 5, -3, 8, 0]))
